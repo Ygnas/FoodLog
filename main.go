@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"net/http"
+
+	"github.com/Ygnas/FoodLog/controllers"
+	"github.com/go-chi/chi"
+)
 
 func main() {
-	fmt.Print("Hello, World!")
+	r := chi.NewRouter()
+
+	r.Get("/listings", controllers.GetListing)
+	r.Post("/listings", controllers.CreateListing)
+
+	http.ListenAndServe(":3000", r)
 }
