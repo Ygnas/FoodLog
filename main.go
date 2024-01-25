@@ -12,6 +12,7 @@ func main() {
 
 	r.Get("/listings", controllers.GetListing)
 	r.Post("/listings", controllers.CreateListing)
+	r.Delete("/listings/{id}", controllers.DeleteListing)
 
 	http.ListenAndServe(":3000", r)
 }
