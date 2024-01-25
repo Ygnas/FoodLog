@@ -24,6 +24,6 @@ func (s *Storage) Create(listing *models.Listing) error {
 	return nil
 }
 
-func (s *Storage) Delete(listing *models.Listing) error {
-	return s.NewRef("listings/" + listing.ID.String()).Delete(context.Background())
+func (s *Storage) Delete(id string) error {
+	return s.NewRef("listings/" + id).Delete(context.Background())
 }
