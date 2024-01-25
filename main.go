@@ -10,7 +10,7 @@ import (
 func main() {
 	r := chi.NewRouter()
 
-	r.Get("/listings", controllers.GetListing)
+	r.Get("/listings/{id}", controllers.GetListing)
 	r.Post("/listings", controllers.CreateListing)
 	r.Delete("/listings/{id}", controllers.DeleteListing)
 

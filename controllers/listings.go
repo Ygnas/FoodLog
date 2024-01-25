@@ -16,19 +16,10 @@ func GetListing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	listing := models.Listing{
-		ID:          uuid.New(),
-		Title:       "Example Listing",
-		Description: "This is a sample listing",
-		Shared:      true,
-		Image:       "example.jpg",
-		Type:        models.Snack,
-		Rating:      5,
-		Location:    "Sample Location",
-	}
+	id := chi.URLParam(r, "id")
 
 	storage := NewStorage()
-	err = storage.Create(&listing)
+	listing, err := storage.GetListing(id)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
