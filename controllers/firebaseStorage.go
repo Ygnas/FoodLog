@@ -27,3 +27,11 @@ func (s *Storage) Create(listing *models.Listing) error {
 func (s *Storage) Delete(id string) error {
 	return s.NewRef("listings/" + id).Delete(context.Background())
 }
+
+func (s *Storage) GetListing(id string) (*models.Listing, error) {
+	var listing models.Listing
+	if err := s.NewRef("listings/"+id).Get(context.Background(), &listing); err != nil {
+		return nil, err
+	}
+	return &listing, nil
+}
