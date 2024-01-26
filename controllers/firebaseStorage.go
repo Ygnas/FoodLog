@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"log"
 
 	"github.com/Ygnas/FoodLog/models"
 )
@@ -34,4 +35,20 @@ func (s *Storage) GetListing(id string) (*models.Listing, error) {
 		return nil, err
 	}
 	return &listing, nil
+}
+
+func (s *Storage) GetAllListings() ([]*models.Listing, error) {
+	var listingsMap map[string]*models.Listing
+
+	if err := s.NewRef("listings").Get(context.Background(), &listingsMap); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	var listings []*models.Listing
+	for _, listing := range listingsMap {
+		listings = append(listings, listing)
+	}
+
+	return listings, nil
 }
