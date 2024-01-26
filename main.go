@@ -9,14 +9,27 @@ import (
 )
 
 func main() {
-	r := chi.NewRouter()
+	r := CreateNewRouter()
+	r.MountRoutes()
 
-	r.Use(middleware.Logger)
+	http.ListenAndServe(":3000", r.Router)
+}
 
-	r.Get("/listings", controllers.GetAllListings)
-	r.Get("/listings/{id}", controllers.GetListing)
-	r.Post("/listings", controllers.CreateListing)
-	r.Delete("/listings/{id}", controllers.DeleteListing)
+type Router struct {
+	Router *chi.Mux
+}
 
-	http.ListenAndServe(":3000", r)
+func CreateNewRouter() *Router {
+	r := &Router{}
+	r.Router = chi.NewRouter()
+	return r
+}
+
+func (r *Router) MountRoutes() {
+	r.Router.Use(middleware.Logger)
+
+	r.Router.Get("/listings", controllers.GetAllListings)
+	r.Router.Get("/listings/{id}", controllers.GetListing)
+	r.Router.Post("/listings", controllers.CreateListing)
+	r.Router.Delete("/listings/{id}", controllers.DeleteListing)
 }
