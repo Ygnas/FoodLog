@@ -105,3 +105,33 @@ func DeleteListing(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte("Listing deleted"))
 }
+
+func UpdateListing(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	var listing models.Listing
+
+	err = json.NewDecoder(r.Body).Decode(&listing)
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	storage := NewStorage()
+	err = storage.UpdateListing(&listing)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	responseJSON, err := json.Marshal(listing)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(responseJSON))
+}

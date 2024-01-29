@@ -31,5 +31,6 @@ func (r *Router) MountRoutes() {
 	r.Router.Get("/listings", controllers.GetAllListings)
 	r.Router.Get("/listings/{id}", controllers.GetListing)
 	r.Router.Post("/listings", controllers.CreateListing)
+	r.Router.Put("/listings/{id}", controllers.UpdateListing)
 	r.Router.Delete("/listings/{id}", controllers.DeleteListing)
 }
