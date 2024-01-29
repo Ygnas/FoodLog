@@ -72,6 +72,25 @@ func TestCreateListing(t *testing.T) {
 	}
 }
 
+func TestUpdateListing(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	var listing models.Listing
+
+	newListing.Title = "Test-updated"
+	jsonInput, err := json.Marshal(newListing)
+	require.NoError(t, err)
+
+	req, _ := http.NewRequest("PUT", "/listings/"+newListing.ID.String(), bytes.NewBuffer(jsonInput))
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	json.NewDecoder(response.Body).Decode(&listing)
+	require.Equal(t, "Test-updated", listing.Title)
+}
+
 func TestDeleteListing(t *testing.T) {
 	r := CreateNewRouter()
 
