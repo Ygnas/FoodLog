@@ -52,3 +52,10 @@ func (s *Storage) GetAllListings() ([]*models.Listing, error) {
 
 	return listings, nil
 }
+
+func (s *Storage) UpdateListing(listing *models.Listing) error {
+	if err := s.NewRef("listings/"+listing.ID.String()).Set(context.Background(), listing); err != nil {
+		return err
+	}
+	return nil
+}
