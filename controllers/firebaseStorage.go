@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"encoding/base64"
 	"log"
 
 	"github.com/Ygnas/FoodLog/models"
@@ -58,4 +59,22 @@ func (s *Storage) UpdateListing(listing *models.Listing) error {
 		return err
 	}
 	return nil
+}
+
+func (s *Storage) RegisterUser(user *models.User) error {
+	encodedEmail := base64.URLEncoding.EncodeToString([]byte(user.Email))
+	if err := s.NewRef("users/"+encodedEmail).Set(context.Background(), user); err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func (s *Storage) LoginUser(user *models.User) (*models.User, error) {
+	var returnedUser models.User
+	encodedEmail := base64.URLEncoding.EncodeToString([]byte(user.Email))
+	if err := s.NewRef("users/"+encodedEmail).Get(context.Background(), &returnedUser); err != nil {
+		return nil, err
+	}
+	return &returnedUser, nil
 }
