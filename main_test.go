@@ -28,12 +28,52 @@ var newListing = models.Listing{
 	Location:    "Test",
 }
 
+var newUser = models.User{
+	Email:    "test@test.com",
+	Name:     "test",
+	Password: "test",
+}
+
+var testToken string
+
+func TestRegister(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	jsonInput, err := json.Marshal(newUser)
+	require.NoError(t, err)
+
+	req, _ := http.NewRequest("POST", "/users/register", bytes.NewBuffer(jsonInput))
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	require.NotEmpty(t, response.Body.String())
+}
+
+func TestLogin(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	jsonInput, err := json.Marshal(newUser)
+	require.NoError(t, err)
+
+	req, _ := http.NewRequest("POST", "/users/login", bytes.NewBuffer(jsonInput))
+	response := executeRequest(req, r)
+
+	testToken = response.Body.String()
+	require.Equal(t, http.StatusOK, response.Code)
+	require.NotEmpty(t, response.Body.String())
+}
+
 func TestGetListing(t *testing.T) {
 	r := CreateNewRouter()
 
 	r.MountRoutes()
 
 	req, _ := http.NewRequest("GET", "/listings/01ed812a-d465-4b4c-b3e7-15e46a005910", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 
 	require.Equal(t, http.StatusOK, response.Code)
@@ -46,6 +86,7 @@ func TestGetAllListings(t *testing.T) {
 	r.MountRoutes()
 
 	req, _ := http.NewRequest("GET", "/listings", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 
 	require.Equal(t, http.StatusOK, response.Code)
@@ -61,6 +102,7 @@ func TestCreateListing(t *testing.T) {
 	require.NoError(t, err)
 
 	req, _ := http.NewRequest("POST", "/listings", bytes.NewBuffer(jsonInput))
+	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 
 	require.Equal(t, http.StatusOK, response.Code)
@@ -84,6 +126,7 @@ func TestUpdateListing(t *testing.T) {
 	require.NoError(t, err)
 
 	req, _ := http.NewRequest("PUT", "/listings/"+newListing.ID.String(), bytes.NewBuffer(jsonInput))
+	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 
 	require.Equal(t, http.StatusOK, response.Code)
@@ -97,6 +140,7 @@ func TestDeleteListing(t *testing.T) {
 	r.MountRoutes()
 
 	req, _ := http.NewRequest("DELETE", "/listings/"+newListing.ID.String(), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 
 	require.Equal(t, http.StatusOK, response.Code)
