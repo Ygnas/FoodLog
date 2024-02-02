@@ -3,9 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/Ygnas/FoodLog/models"
+	"github.com/Ygnas/FoodLog/util"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/google/uuid"
 )
 
@@ -17,9 +20,10 @@ func GetListing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := chi.URLParam(r, "id")
+	_, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
-	listing, err := storage.GetListing(id)
+	listing, err := storage.GetListing(util.Base64Encode(claims["email"].(string)), id)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -40,8 +44,10 @@ func GetAllListings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, claims, _ := jwtauth.FromContext(r.Context())
+
 	storage := NewStorage()
-	listings, err := storage.GetAllListings()
+	listings, err := storage.GetAllListings(util.Base64Encode(claims["email"].(string)))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -71,9 +77,11 @@ func CreateListing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	listing.ID = uuid.New()
+	listing.CreatedAt = time.Now()
+	_, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
-	err = storage.Create(&listing)
+	err = storage.Create(util.Base64Encode(claims["email"].(string)), &listing)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
@@ -95,13 +103,47 @@ func DeleteListing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := chi.URLParam(r, "id")
+	_, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
-	err = storage.Delete(id)
+	err = storage.Delete(util.Base64Encode(claims["email"].(string)), id)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
 	w.Write([]byte("Listing deleted"))
+}
+
+func UpdateListing(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	var listing models.Listing
+
+	err = json.NewDecoder(r.Body).Decode(&listing)
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	listing.UpdatedAt = time.Now()
+	_, claims, _ := jwtauth.FromContext(r.Context())
+
+	storage := NewStorage()
+	err = storage.UpdateListing(util.Base64Encode(claims["email"].(string)), &listing)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	responseJSON, err := json.Marshal(listing)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(responseJSON))
 }
