@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"context"
-	"encoding/base64"
 	"log"
 
 	"github.com/Ygnas/FoodLog/models"
+	"github.com/Ygnas/FoodLog/util"
 )
 
 type Storage struct {
@@ -19,29 +19,29 @@ func NewStorage() *Storage {
 	}
 }
 
-func (s *Storage) Create(listing *models.Listing) error {
-	if err := s.NewRef("listings/"+listing.ID.String()).Set(context.Background(), listing); err != nil {
+func (s *Storage) Create(emailHash string, listing *models.Listing) error {
+	if err := s.NewRef("listings/").Child(emailHash).Child(listing.ID.String()).Set(context.Background(), listing); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *Storage) Delete(id string) error {
-	return s.NewRef("listings/" + id).Delete(context.Background())
+func (s *Storage) Delete(emailHash string, id string) error {
+	return s.NewRef("listings/").Child(emailHash).Child(id).Delete(context.Background())
 }
 
-func (s *Storage) GetListing(id string) (*models.Listing, error) {
+func (s *Storage) GetListing(emailHash string, id string) (*models.Listing, error) {
 	var listing models.Listing
-	if err := s.NewRef("listings/"+id).Get(context.Background(), &listing); err != nil {
+	if err := s.NewRef("listings/").Child(emailHash).Child(id).Get(context.Background(), &listing); err != nil {
 		return nil, err
 	}
 	return &listing, nil
 }
 
-func (s *Storage) GetAllListings() ([]*models.Listing, error) {
+func (s *Storage) GetAllListings(emailHash string) ([]*models.Listing, error) {
 	var listingsMap map[string]*models.Listing
 
-	if err := s.NewRef("listings").Get(context.Background(), &listingsMap); err != nil {
+	if err := s.NewRef("listings").Child(emailHash).Get(context.Background(), &listingsMap); err != nil {
 		log.Println(err)
 		return nil, err
 	}
@@ -54,16 +54,15 @@ func (s *Storage) GetAllListings() ([]*models.Listing, error) {
 	return listings, nil
 }
 
-func (s *Storage) UpdateListing(listing *models.Listing) error {
-	if err := s.NewRef("listings/"+listing.ID.String()).Set(context.Background(), listing); err != nil {
+func (s *Storage) UpdateListing(emailHash string, listing *models.Listing) error {
+	if err := s.NewRef("listings/").Child(emailHash).Child(listing.ID.String()).Set(context.Background(), listing); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (s *Storage) RegisterUser(user *models.User) error {
-	encodedEmail := base64.URLEncoding.EncodeToString([]byte(user.Email))
-	if err := s.NewRef("users/"+encodedEmail).Set(context.Background(), user); err != nil {
+	if err := s.NewRef("users/"+util.Base64Encode(user.Email)).Set(context.Background(), user); err != nil {
 		return err
 	}
 	return nil
@@ -72,8 +71,7 @@ func (s *Storage) RegisterUser(user *models.User) error {
 
 func (s *Storage) LoginUser(user *models.User) (*models.User, error) {
 	var returnedUser models.User
-	encodedEmail := base64.URLEncoding.EncodeToString([]byte(user.Email))
-	if err := s.NewRef("users/"+encodedEmail).Get(context.Background(), &returnedUser); err != nil {
+	if err := s.NewRef("users/"+util.Base64Encode(user.Email)).Get(context.Background(), &returnedUser); err != nil {
 		return nil, err
 	}
 	return &returnedUser, nil

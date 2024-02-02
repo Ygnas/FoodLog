@@ -26,6 +26,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.ID = uuid.New()
+	user.CreatedAt = time.Now()
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
