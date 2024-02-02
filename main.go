@@ -2,10 +2,12 @@ package main
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/Ygnas/FoodLog/controllers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/httprate"
 	"github.com/go-chi/jwtauth/v5"
 )
 
@@ -29,7 +31,13 @@ func CreateNewRouter() *Router {
 func (r *Router) MountRoutes() {
 	controllers.NewJwt()
 	jwt := controllers.GetTokenAuth()
+
 	r.Router.Use(middleware.Logger)
+	r.Router.Use(httprate.Limit(
+		100,
+		time.Minute*1,
+		httprate.WithKeyFuncs(httprate.KeyByIP, httprate.KeyByEndpoint),
+	))
 
 	r.Router.Group(func(r chi.Router) {
 		r.Use(jwtauth.Verifier(jwt.TokenAuth))
