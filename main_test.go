@@ -25,7 +25,7 @@ var newListing = models.Listing{
 	Image:       "Test",
 	Type:        models.Snack,
 	Rating:      5,
-	Location:    "Test",
+	Location:    models.Location{Latitude: 0, Longitude: 0},
 }
 
 var newUser = models.User{
@@ -67,25 +67,12 @@ func TestLogin(t *testing.T) {
 	require.NotEmpty(t, response.Body.String())
 }
 
-func TestGetListing(t *testing.T) {
+func TestGetListingEmpty(t *testing.T) {
 	r := CreateNewRouter()
 
 	r.MountRoutes()
 
-	req, _ := http.NewRequest("GET", "/listings/01ed812a-d465-4b4c-b3e7-15e46a005910", nil)
-	req.Header.Set("Authorization", "Bearer "+testToken)
-	response := executeRequest(req, r)
-
-	require.Equal(t, http.StatusOK, response.Code)
-	require.Equal(t, "{\"id\":\"01ed812a-d465-4b4c-b3e7-15e46a005910\",\"title\":\"Example Listing\",\"description\":\"This is a sample listing\",\"shared\":true,\"image\":\"example.jpg\",\"type\":\"Snack\",\"rating\":5,\"location\":\"Sample Location\"}", response.Body.String())
-}
-
-func TestGetAllListings(t *testing.T) {
-	r := CreateNewRouter()
-
-	r.MountRoutes()
-
-	req, _ := http.NewRequest("GET", "/listings", nil)
+	req, _ := http.NewRequest("GET", "/listings/00000", nil)
 	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 
@@ -112,6 +99,36 @@ func TestCreateListing(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+}
+
+func TestGetListing(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	var listing models.Listing
+
+	req, _ := http.NewRequest("GET", "/listings/"+newListing.ID.String(), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	require.NotEmpty(t, response.Body.String())
+	json.NewDecoder(response.Body).Decode(&listing)
+	require.Equal(t, "Test", listing.Title)
+}
+
+func TestGetAllListings(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	req, _ := http.NewRequest("GET", "/listings", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	require.NotEmpty(t, response.Body.String())
 }
 
 func TestUpdateListing(t *testing.T) {
