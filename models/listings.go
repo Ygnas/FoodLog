@@ -22,9 +22,8 @@ type Comment struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-type Review struct {
-	Email  string `json:"email"`
-	Rating int    `json:"rating"`
+type Like struct {
+	Email string `json:"email"`
 }
 
 type Location struct {
@@ -39,8 +38,7 @@ type Listing struct {
 	Shared      bool      `json:"shared"`
 	Image       string    `json:"image"`
 	Type        MealType  `json:"type"`
-	Rating      int       `json:"rating"`
-	Reviews     []Review  `json:"reviews"`
+	Likes       []Like    `json:"likes"`
 	Location    Location  `json:"location"`
 	Comments    []Comment `json:"comments"`
 	CreatedAt   time.Time `json:"created_at"`
