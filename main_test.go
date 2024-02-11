@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/Ygnas/FoodLog/models"
 	"github.com/stretchr/testify/require"
@@ -24,8 +25,15 @@ var newListing = models.Listing{
 	Shared:      true,
 	Image:       "Test",
 	Type:        models.Snack,
-	Rating:      5,
-	Location:    models.Location{Latitude: 0, Longitude: 0},
+	Likes: []models.Like{
+		{Email: "test@test.com"},
+	},
+	Comments: []models.Comment{
+		{Email: "test@test.com", Comment: "Test", CreatedAt: time.Now()},
+	},
+	Location:  models.Location{Latitude: 0, Longitude: 0},
+	CreatedAt: time.Now(),
+	UpdatedAt: time.Now(),
 }
 
 var newUser = models.User{
