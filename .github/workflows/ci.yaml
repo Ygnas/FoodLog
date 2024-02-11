@@ -1,10 +1,8 @@
 name: CI
 
 on:
-  push:
-    branches: ['main', 'Develop']
   pull_request:
-    branches: ['main', 'Develop']
+    branches: ["main", "Develop"]
 
 jobs:
   test:
@@ -30,7 +28,7 @@ jobs:
 
       - name: Run Tests
         run: go test -v
-        
+
   build:
     name: Build code
     runs-on: ubuntu-latest
