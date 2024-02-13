@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/Ygnas/FoodLog/models"
@@ -52,6 +53,10 @@ func GetAllListings(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	sort.Slice(listings, func(i, j int) bool {
+		return listings[i].CreatedAt.After(listings[j].CreatedAt)
+	})
 
 	responseJSON, err := json.Marshal(listings)
 	if err != nil {
