@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"log"
+	"os"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/db"
@@ -18,9 +19,11 @@ var firebaseDatabase FirebaseDatabase
 func (db *FirebaseDatabase) FirebaseConnect() error {
 	ctx := context.Background()
 
+	databaseURL := os.Getenv("DATABASE_URL")
+
 	opt := option.WithCredentialsFile("foodlog-credentials.json")
 	conf := &firebase.Config{
-		DatabaseURL: "https://foodlog-9c3fd-default-rtdb.europe-west1.firebasedatabase.app/",
+		DatabaseURL: databaseURL,
 	}
 
 	app, err := firebase.NewApp(ctx, conf, opt)
