@@ -126,7 +126,7 @@ func TestGetListing(t *testing.T) {
 	require.Equal(t, "Test", listing.Title)
 }
 
-func TestGetAllListings(t *testing.T) {
+func TestGetAllUserListings(t *testing.T) {
 	r := CreateNewRouter()
 
 	r.MountRoutes()
@@ -170,4 +170,17 @@ func TestDeleteListing(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, response.Code)
 	require.Equal(t, "Listing deleted", response.Body.String())
+}
+
+func TestGetAllListings(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	req, _ := http.NewRequest("GET", "/all-listings", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	require.NotEmpty(t, response.Body.String())
 }
