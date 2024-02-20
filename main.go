@@ -43,7 +43,8 @@ func (r *Router) MountRoutes() {
 		r.Use(jwtauth.Verifier(jwt.TokenAuth))
 		r.Use(jwtauth.Authenticator(jwt.TokenAuth))
 
-		r.Get("/listings", controllers.GetAllListings)
+		r.Get("/listings", controllers.GetAllUserListings)
+		r.Get("/all-listings", controllers.GetAllListings)
 		r.Get("/listings/{id}", controllers.GetListing)
 		r.Post("/listings", controllers.CreateListing)
 		r.Put("/listings/{id}", controllers.UpdateListing)
