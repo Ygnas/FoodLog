@@ -38,7 +38,7 @@ func (s *Storage) GetListing(emailHash string, id string) (*models.Listing, erro
 	return &listing, nil
 }
 
-func (s *Storage) GetAllListings(emailHash string) ([]*models.Listing, error) {
+func (s *Storage) GetAllUserListings(emailHash string) ([]*models.Listing, error) {
 	var listingsMap map[string]*models.Listing
 
 	if err := s.NewRef("listings").Child(emailHash).Get(context.Background(), &listingsMap); err != nil {
@@ -75,4 +75,31 @@ func (s *Storage) LoginUser(user *models.User) (*models.User, error) {
 		return nil, err
 	}
 	return &returnedUser, nil
+}
+
+func (s *Storage) GetAllListings() ([]*models.Listing, error) {
+	var listingsMap map[string]map[string]*models.Listing
+
+	if err := s.NewRef("listings").Get(context.Background(), &listingsMap); err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	var listings []*models.Listing
+	for _, userListing := range listingsMap {
+		for _, listing := range userListing {
+			listings = append(listings, listing)
+		}
+	}
+
+	return listings, nil
+}
+
+func (s *Storage) DeleteUser(emailHash string) error {
+	s.DeleteAllUserListings(emailHash)
+	return s.NewRef("users").Child(emailHash).Delete(context.Background())
+}
+
+func (s *Storage) DeleteAllUserListings(emailHash string) error {
+	return s.NewRef("listings").Child(emailHash).Delete(context.Background())
 }

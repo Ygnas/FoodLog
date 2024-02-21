@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/Ygnas/FoodLog/models"
@@ -37,7 +38,7 @@ func GetListing(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(responseJSON))
 }
 
-func GetAllListings(w http.ResponseWriter, r *http.Request) {
+func GetAllUserListings(w http.ResponseWriter, r *http.Request) {
 	err := GetFirebaseDatabase().FirebaseConnect()
 	if err != nil {
 		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
@@ -47,11 +48,15 @@ func GetAllListings(w http.ResponseWriter, r *http.Request) {
 	_, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
-	listings, err := storage.GetAllListings(util.Base64Encode(claims["email"].(string)))
+	listings, err := storage.GetAllUserListings(util.Base64Encode(claims["email"].(string)))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+
+	sort.Slice(listings, func(i, j int) bool {
+		return listings[i].CreatedAt.After(listings[j].CreatedAt)
+	})
 
 	responseJSON, err := json.Marshal(listings)
 	if err != nil {
@@ -141,6 +146,32 @@ func UpdateListing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responseJSON, err := json.Marshal(listing)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(responseJSON))
+}
+
+func GetAllListings(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	storage := NewStorage()
+	listings, err := storage.GetAllListings()
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	sort.Slice(listings, func(i, j int) bool {
+		return listings[i].CreatedAt.After(listings[j].CreatedAt)
+	})
+
+	responseJSON, err := json.Marshal(listings)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return

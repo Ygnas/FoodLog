@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Ygnas/FoodLog/models"
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -91,4 +92,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte(tokenString))
+}
+
+func DeleteUserByID(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+	id := chi.URLParam(r, "id")
+	// _, claims, _ := jwtauth.FromContext(r.Context())
+
+	storage := NewStorage()
+	err = storage.DeleteUser(id)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("User deleted"))
 }

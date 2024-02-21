@@ -27,6 +27,8 @@ jobs:
         shell: bash
 
       - name: Run Tests
+        env:
+          DATABASE_URL: ${{secrets.DATABASE_URL}}
         run: go test -v
 
   build:
