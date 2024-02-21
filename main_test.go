@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Ygnas/FoodLog/models"
+	"github.com/Ygnas/FoodLog/util"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,9 +38,9 @@ var newListing = models.Listing{
 }
 
 var newUser = models.User{
-	Email:    "test@test.com",
-	Name:     "test",
-	Password: "test",
+	Email:    "gotest@gotest.com",
+	Name:     "gotest",
+	Password: "gotest",
 }
 
 var testToken string
@@ -183,4 +184,17 @@ func TestGetAllListings(t *testing.T) {
 
 	require.Equal(t, http.StatusOK, response.Code)
 	require.NotEmpty(t, response.Body.String())
+}
+
+func TestDeleteUserByID(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	req, _ := http.NewRequest("DELETE", "/users/delete/"+util.Base64Encode(newUser.Email), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+	require.Equal(t, "User deleted", response.Body.String())
 }
