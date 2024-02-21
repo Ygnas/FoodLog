@@ -94,3 +94,12 @@ func (s *Storage) GetAllListings() ([]*models.Listing, error) {
 
 	return listings, nil
 }
+
+func (s *Storage) DeleteUser(emailHash string) error {
+	s.DeleteAllUserListings(emailHash)
+	return s.NewRef("users").Child(emailHash).Delete(context.Background())
+}
+
+func (s *Storage) DeleteAllUserListings(emailHash string) error {
+	return s.NewRef("listings").Child(emailHash).Delete(context.Background())
+}
