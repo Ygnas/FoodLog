@@ -49,6 +49,7 @@ func (r *Router) MountRoutes() {
 		r.Post("/listings", controllers.CreateListing)
 		r.Put("/listings/{id}", controllers.UpdateListing)
 		r.Delete("/listings/{id}", controllers.DeleteListing)
+		r.Delete("/users/delete/{id}", controllers.DeleteUserByID)
 	})
 
 	r.Router.Group(func(r chi.Router) {
