@@ -160,6 +160,28 @@ func TestUpdateListing(t *testing.T) {
 	require.Equal(t, "Test-updated", listing.Title)
 }
 
+func TestLikeListing(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	var listing models.Listing
+
+	req, _ := http.NewRequest("POST", "/listings/"+newListing.ID.String()+"/like", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("GET", "/listings/"+newListing.ID.String(), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response = executeRequest(req, r)
+
+	json.NewDecoder(response.Body).Decode(&listing)
+
+	require.Equal(t, 2, len(listing.Likes))
+}
+
 func TestDeleteListing(t *testing.T) {
 	r := CreateNewRouter()
 
