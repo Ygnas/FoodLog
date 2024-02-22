@@ -178,3 +178,23 @@ func GetAllListings(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write([]byte(responseJSON))
 }
+
+func LikeListing(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+	_, claims, _ := jwtauth.FromContext(r.Context())
+
+	storage := NewStorage()
+	err = storage.LikeListing(util.Base64Encode(claims["email"].(string)), id)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("Like updated"))
+}
