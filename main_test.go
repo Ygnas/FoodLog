@@ -33,6 +33,7 @@ var newListing = models.Listing{
 		{Email: "test@test.com", Comment: "Test", CreatedAt: time.Now()},
 	},
 	Location:  models.Location{Latitude: 0, Longitude: 0},
+	UserEmail: "gotest@gotest.com",
 	CreatedAt: time.Now(),
 	UpdatedAt: time.Now(),
 }
@@ -158,6 +159,28 @@ func TestUpdateListing(t *testing.T) {
 	require.Equal(t, http.StatusOK, response.Code)
 	json.NewDecoder(response.Body).Decode(&listing)
 	require.Equal(t, "Test-updated", listing.Title)
+}
+
+func TestLikeListing(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	var listing models.Listing
+
+	req, _ := http.NewRequest("POST", "/listings/"+newListing.ID.String()+"/"+newListing.UserEmail+"/like", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("GET", "/listings/"+newListing.ID.String(), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response = executeRequest(req, r)
+
+	json.NewDecoder(response.Body).Decode(&listing)
+
+	require.Equal(t, 2, len(listing.Likes))
 }
 
 func TestDeleteListing(t *testing.T) {

@@ -20,6 +20,7 @@ func NewStorage() *Storage {
 }
 
 func (s *Storage) Create(emailHash string, listing *models.Listing) error {
+	listing.UserEmail = util.Base64Decode(emailHash)
 	if err := s.NewRef("listings/").Child(emailHash).Child(listing.ID.String()).Set(context.Background(), listing); err != nil {
 		return err
 	}
@@ -102,4 +103,30 @@ func (s *Storage) DeleteUser(emailHash string) error {
 
 func (s *Storage) DeleteAllUserListings(emailHash string) error {
 	return s.NewRef("listings").Child(emailHash).Delete(context.Background())
+}
+
+func (s *Storage) LikeListing(listingID string, listingEmail string, email string) error {
+	var listing models.Listing
+
+	if err := s.NewRef("listings").Child(listingEmail).Child(listingID).Get(context.Background(), &listing); err != nil {
+		return err
+	}
+
+	existingIndex := -1
+
+	for index, like := range listing.Likes {
+		if like.Email == email {
+			existingIndex = index
+			break
+		}
+	}
+
+	if existingIndex != -1 {
+		listing.Likes = append(listing.Likes[:existingIndex], listing.Likes[existingIndex+1:]...)
+	} else {
+		listing.Likes = append(listing.Likes, models.Like{Email: email})
+	}
+
+	return s.NewRef("listings").Child(listingEmail).Child(listingID).Set(context.Background(), listing)
+
 }
