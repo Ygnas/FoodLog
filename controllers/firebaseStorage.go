@@ -103,3 +103,33 @@ func (s *Storage) DeleteUser(emailHash string) error {
 func (s *Storage) DeleteAllUserListings(emailHash string) error {
 	return s.NewRef("listings").Child(emailHash).Delete(context.Background())
 }
+
+func (s *Storage) LikeListing(emailHash string, listingID string) error {
+	listing, err := s.GetListing(emailHash, listingID)
+	if err != nil {
+		return err
+	}
+
+	email := util.Base64Decode(emailHash)
+
+	existingIndex := -1
+
+	for index, like := range listing.Likes {
+		if like.Email == email {
+			existingIndex = index
+			break
+		}
+	}
+
+	if existingIndex != -1 {
+		listing.Likes = append(listing.Likes[:existingIndex], listing.Likes[existingIndex+1:]...)
+	} else {
+		listing.Likes = append(listing.Likes, models.Like{Email: email})
+	}
+
+	if err := s.UpdateListing(emailHash, listing); err != nil {
+		return err
+	}
+
+	return nil
+}
