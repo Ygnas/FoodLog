@@ -41,6 +41,7 @@ type Listing struct {
 	Likes       []Like    `json:"likes"`
 	Location    Location  `json:"location"`
 	Comments    []Comment `json:"comments"`
+	UserEmail   string    `json:"user_email"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

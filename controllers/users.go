@@ -101,7 +101,6 @@ func DeleteUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := chi.URLParam(r, "id")
-	// _, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
 	err = storage.DeleteUser(id)
