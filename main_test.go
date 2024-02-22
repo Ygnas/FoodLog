@@ -33,6 +33,7 @@ var newListing = models.Listing{
 		{Email: "test@test.com", Comment: "Test", CreatedAt: time.Now()},
 	},
 	Location:  models.Location{Latitude: 0, Longitude: 0},
+	UserEmail: "gotest@gotest.com",
 	CreatedAt: time.Now(),
 	UpdatedAt: time.Now(),
 }
@@ -167,7 +168,7 @@ func TestLikeListing(t *testing.T) {
 
 	var listing models.Listing
 
-	req, _ := http.NewRequest("POST", "/listings/"+newListing.ID.String()+"/like", nil)
+	req, _ := http.NewRequest("POST", "/listings/"+newListing.ID.String()+"/"+newListing.UserEmail+"/like", nil)
 	req.Header.Set("Authorization", "Bearer "+testToken)
 	response := executeRequest(req, r)
 

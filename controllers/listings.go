@@ -187,10 +187,12 @@ func LikeListing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := chi.URLParam(r, "id")
+	email := chi.URLParam(r, "email")
+
 	_, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
-	err = storage.LikeListing(util.Base64Encode(claims["email"].(string)), id)
+	err = storage.LikeListing(id, util.Base64Encode(email), claims["email"].(string))
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
