@@ -44,6 +44,12 @@ var newUser = models.User{
 	Password: "gotest",
 }
 
+var comment = models.Comment{
+	Email:     "gotest@gotest.com",
+	Comment:   "Test comment",
+	CreatedAt: time.Now(),
+}
+
 var testToken string
 
 func TestRegister(t *testing.T) {
@@ -181,6 +187,32 @@ func TestLikeListing(t *testing.T) {
 	json.NewDecoder(response.Body).Decode(&listing)
 
 	require.Equal(t, 2, len(listing.Likes))
+}
+
+// test comment a listing
+func TestCommentListing(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	var listing models.Listing
+
+	jsonInput, err := json.Marshal(comment)
+	require.NoError(t, err)
+
+	req, _ := http.NewRequest("POST", "/listings/"+newListing.ID.String()+"/"+newListing.UserEmail+"/comment", bytes.NewBuffer(jsonInput))
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+
+	req, _ = http.NewRequest("GET", "/listings/"+newListing.ID.String(), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response = executeRequest(req, r)
+
+	json.NewDecoder(response.Body).Decode(&listing)
+
+	require.Equal(t, 2, len(listing.Comments))
 }
 
 func TestDeleteListing(t *testing.T) {
