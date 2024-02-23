@@ -130,3 +130,16 @@ func (s *Storage) LikeListing(listingID string, listingEmail string, email strin
 	return s.NewRef("listings").Child(listingEmail).Child(listingID).Set(context.Background(), listing)
 
 }
+
+func (s *Storage) CommentListing(listingID string, listingEmail string, comment models.Comment) error {
+	var listing models.Listing
+
+	if err := s.NewRef("listings").Child(listingEmail).Child(listingID).Get(context.Background(), &listing); err != nil {
+		return err
+	}
+
+	listing.Comments = append(listing.Comments, models.Comment{Email: comment.Email, Comment: comment.Comment, CreatedAt: comment.CreatedAt})
+
+	return s.NewRef("listings").Child(listingEmail).Child(listingID).Set(context.Background(), listing)
+
+}
