@@ -51,6 +51,7 @@ func (r *Router) MountRoutes() {
 		r.Delete("/listings/{id}", controllers.DeleteListing)
 		r.Delete("/users/delete/{id}", controllers.DeleteUserByID)
 		r.Post("/listings/{id}/{email}/like", controllers.LikeListing)
+		r.Post("/listings/{id}/{email}/comment", controllers.CommentListing)
 	})
 
 	r.Router.Group(func(r chi.Router) {
