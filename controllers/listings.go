@@ -200,3 +200,31 @@ func LikeListing(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte("Like updated"))
 }
+
+func CommentListing(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+	email := chi.URLParam(r, "email")
+
+	var comment models.Comment
+
+	err = json.NewDecoder(r.Body).Decode(&comment)
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+
+	storage := NewStorage()
+	err = storage.CommentListing(id, util.Base64Encode(email), comment)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("Comment added"))
+}
