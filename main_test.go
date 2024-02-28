@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -165,6 +166,33 @@ func TestUpdateListing(t *testing.T) {
 	require.Equal(t, http.StatusOK, response.Code)
 	json.NewDecoder(response.Body).Decode(&listing)
 	require.Equal(t, "Test-updated", listing.Title)
+}
+
+func TestUploadImage(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	req, _ := http.NewRequest("POST", "/upload/"+newListing.ID.String(), nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	// need bytes in body to test
+	req.Body = io.NopCloser(bytes.NewBuffer([]byte("notimage")))
+
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
+}
+
+func TestDeleteImage(t *testing.T) {
+	r := CreateNewRouter()
+
+	r.MountRoutes()
+
+	req, _ := http.NewRequest("DELETE", "/images/"+newListing.ID.String()+"/delete", nil)
+	req.Header.Set("Authorization", "Bearer "+testToken)
+	response := executeRequest(req, r)
+
+	require.Equal(t, http.StatusOK, response.Code)
 }
 
 func TestLikeListing(t *testing.T) {
