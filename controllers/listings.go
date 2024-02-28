@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"sort"
 	"time"
@@ -227,4 +228,55 @@ func CommentListing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Write([]byte("Comment added"))
+}
+
+func UploadImage(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+
+	storage := NewStorage()
+
+	imageBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+
+	image, err := storage.UploadImage(id, imageBytes)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	responseJSON, err := json.Marshal(image)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Write([]byte(responseJSON))
+}
+
+func DeleteImage(w http.ResponseWriter, r *http.Request) {
+	err := GetFirebaseDatabase().FirebaseConnect()
+	if err != nil {
+		http.Error(w, "Could not connect to Firebase", http.StatusInternalServerError)
+		return
+	}
+
+	id := chi.URLParam(r, "id")
+
+	storage := NewStorage()
+	err = storage.DeleteImage(id)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Write([]byte("Image deleted"))
 }
