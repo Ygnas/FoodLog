@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"log"
+	"strings"
 
 	"github.com/Ygnas/FoodLog/models"
 	"github.com/Ygnas/FoodLog/util"
@@ -142,4 +143,36 @@ func (s *Storage) CommentListing(listingID string, listingEmail string, comment 
 
 	return s.NewRef("listings").Child(listingEmail).Child(listingID).Set(context.Background(), listing)
 
+}
+
+func (s *Storage) UploadImage(listingID string, image []byte) (string, error) {
+	imagePath := "listings/" + listingID + ".jpg"
+	bucket, err := s.Storage.DefaultBucket()
+	if err != nil {
+		return "", err
+	}
+	imageRef := bucket.Object(imagePath)
+	writer := imageRef.NewWriter(context.Background())
+	writer.ContentType = "image/jpeg"
+	if _, err := writer.Write(image); err != nil {
+		return "", err
+	}
+	if err := writer.Close(); err != nil {
+		return "", err
+	}
+
+	lowerImagePath := strings.ToLower(imagePath)
+	lowerImagePath = strings.ReplaceAll(lowerImagePath, "/", "%2f")
+
+	return "https://firebasestorage.googleapis.com/v0/b/foodlog-9c3fd.appspot.com/o/" + lowerImagePath + "?alt=media", nil
+}
+
+func (s *Storage) DeleteImage(listingID string) error {
+	imagePath := "listings/" + listingID + ".jpg"
+	bucket, err := s.Storage.DefaultBucket()
+	if err != nil {
+		return err
+	}
+	imageRef := bucket.Object(imagePath)
+	return imageRef.Delete(context.Background())
 }
