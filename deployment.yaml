@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foodlog-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foodlog
+  template:
+    metadata:
+      labels:
+        app: foodlog
+    spec:
+      containers:
+        - name: foodlog
+          image: ghcr.io/ygnas/foodlog:latest
+          envFrom:
+            - configMapRef:
+                name: foodlog-config
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: credentials
+              mountPath: /app/foodlog-credentials.json
+              subPath: foodlog-credentials.json
+      volumes:
+        - name: credentials
+          configMap:
+            name: foodlog-credentials
