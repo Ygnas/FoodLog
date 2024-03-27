@@ -26,5 +26,5 @@ spec:
               subPath: foodlog-credentials.json
       volumes:
         - name: credentials
-          configMap:
-            name: foodlog-credentials
+          secret:
+            secretName: foodlog-credentials
