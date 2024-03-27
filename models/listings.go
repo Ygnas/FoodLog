@@ -9,11 +9,11 @@ import (
 type MealType string
 
 const (
-	Breakfast MealType = "Breakfast"
-	Lunch     MealType = "Lunch"
-	Dinner    MealType = "Dinner"
-	Snack     MealType = "Snack"
-	Dessert   MealType = "Dessert"
+	Breakfast MealType = "breakfast"
+	Lunch     MealType = "lunch"
+	Dinner    MealType = "dinner"
+	Snack     MealType = "snack"
+	Dessert   MealType = "dessert"
 )
 
 type Comment struct {

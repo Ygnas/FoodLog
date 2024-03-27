@@ -85,7 +85,10 @@ func CreateListing(w http.ResponseWriter, r *http.Request) {
 	if listing.ID == uuid.Nil {
 		listing.ID = uuid.New()
 	}
-	listing.CreatedAt = time.Now()
+	if listing.CreatedAt.IsZero() {
+		listing.CreatedAt = time.Now()
+	}
+
 	_, claims, _ := jwtauth.FromContext(r.Context())
 
 	storage := NewStorage()
