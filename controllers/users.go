@@ -81,7 +81,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	jwt := GetTokenAuth()
 	tokenString := jwt.GetToken(map[string]interface{}{
-		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+		"exp":   time.Now().Add(time.Hour * 24 * 30).Unix(),
 		"name":  storedUser.Name,
 		"email": storedUser.Email,
 	})

@@ -372,7 +372,7 @@ func TestDeleteUserByID(t *testing.T) {
 // 				Comments:    []models.Comment{comments[i%len(comments)]},
 // 				Location:    locations[i%len(locations)],
 // 				UserEmail:   userEmail,
-// 				CreatedAt:   date,
+// 				CreatedAt:   date.Add(time.Duration(i) * time.Minute),
 // 				UpdatedAt:   time.Now(),
 // 			}
 
