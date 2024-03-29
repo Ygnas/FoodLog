@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foodlog-config
+data:
+  JWT_SECRET: #Fill this for the JWT token secret generation
+  DATABASE_URL: https://foodlog-9c3fd-default-rtdb.europe-west1.firebasedatabase.app/ #Change this to point to your firebase
