@@ -290,8 +290,8 @@ func TestDeleteUserByID(t *testing.T) {
 
 // 	testTokens = make(map[string]string)
 
-// 	titles := []string{"Cornflakes", "Chicken Salad", "Lamb Chop", "Tiramisu", "Sandwitch", "Pasta and pork", "Chowder in Bread Bowl", "Ice Cream", "Pancakes", "Burger", "Pizza", "Sushi", "Ramen", "Tacos", "Burrito", "Tofu Poke Bowl"}
-// 	descriptions := []string{"", "", "Very delicious", "A little bit too sweet", "", "Not bad", "Need to try this again", "Yummy!", "My favorite breakfast", "Very tasty", "Delicious", "I love sushi", "I love ramen", "", "", "First time, but will try again!"}
+// 	titles := []string{"Cornflakes", "Chicken Salad", "Lamb Chop", "Tiramisu", "Sandwitch", "Pasta and pork", "Chowder in Bread Bowl", "Ice Cream", "Pancakes", "Burger", "Pizza", "Sushi", "Ramen", "Tacos", "Burrito", "Tofu Poke Bowl", "Pasta", "Wild Salmon", "Steak and asparagus", "Creme Brulle"}
+// 	descriptions := []string{"", "", "Very delicious", "A little bit too sweet", "", "Not bad", "Need to try this again", "Yummy!", "My favorite breakfast", "Very tasty", "Delicious", "I love sushi", "I love ramen", "", "", "First time, but will try again!", "", "", "Not the fan of asparagus", "Crunchy and delicious"}
 // 	locations := []models.Location{
 // 		{Latitude: 51.897426, Longitude: -8.465763},
 // 		{Latitude: 51.898514, Longitude: -8.475604},
@@ -324,7 +324,11 @@ func TestDeleteUserByID(t *testing.T) {
 // 		"https://live.staticflickr.com/1/178901_88efb0c812.jpg",
 // 		"https://live.staticflickr.com/4550/24926715648_5f1bcbd5d6_b.jpg",
 // 		"https://upload.wikimedia.org/wikipedia/commons/6/60/Burrito.JPG",
-// 		"https://upload.wikimedia.org/wikipedia/commons/7/7a/Fried_Tofu_Poke_Bowl_%28M%29_with_Wasabi_Soy_sauce_-_Kitokito_2023-06-09.jpg"}
+// 		"https://upload.wikimedia.org/wikipedia/commons/7/7a/Fried_Tofu_Poke_Bowl_%28M%29_with_Wasabi_Soy_sauce_-_Kitokito_2023-06-09.jpg",
+// 		"https://live.staticflickr.com/1338/1151299870_b713be2ffa_b.jpg",
+// 		"https://live.staticflickr.com/13/16612423_949b98c78c.jpg",
+// 		"https://upload.wikimedia.org/wikipedia/commons/0/08/Steak_and_asparagus.jpg",
+// 		"https://live.staticflickr.com/7285/9687444563_93fc3469f2_b.jpg"}
 // 	likes := []models.Like{
 // 		{Email: "lana@test.com"},
 // 		{Email: "lukas@test.com"},
@@ -405,9 +409,13 @@ func TestDeleteUserByID(t *testing.T) {
 // 	r := CreateNewRouter()
 
 // 	r.MountRoutes()
+
+// 	index := strings.Index(email, "@")
+// 	name := email[:index]
+
 // 	newUser := models.User{
 // 		Email:    email,
-// 		Name:     "gotest",
+// 		Name:     name,
 // 		Password: "test",
 // 	}
 
