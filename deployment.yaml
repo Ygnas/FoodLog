@@ -15,6 +15,7 @@ spec:
       containers:
         - name: foodlog
           image: ghcr.io/ygnas/foodlog:latest
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: foodlog-config
